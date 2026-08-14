@@ -53,7 +53,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     GoogleSheetService.fetchUsers().then(setUsersCache).catch(console.error);
   }, []);
 
-  const headingText = "WE BUILD END-TO-END AI AUTOMATION SYSTEMS.";
+  const headingText = "WELCOME TO OUR ORGANIZATION";
   const words = headingText.split(' ');
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -249,7 +249,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </h2>
 
             <FadeUp as="p" className="ai-subtext" delay={0.9}>
-              We provide all-in-one AI automation services in one place.
+              <span style={{ opacity: 0.7, fontSize: '13px', letterSpacing: '1px', textTransform: 'uppercase' }}>Developed By</span>
+              <br />
+              <strong style={{ fontWeight: 800, fontSize: '18px', background: 'linear-gradient(to right, #06b6d4, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Deepak Sahu</strong>
             </FadeUp>
 
             <FadeUp delay={1.1} className="ai-form" once={true}>
