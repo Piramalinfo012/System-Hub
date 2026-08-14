@@ -55,14 +55,8 @@ export default function App() {
         try { return JSON.parse(stored); } catch { return null; }
       }
     }
-    // Default logged-in user for fast experience
-    return {
-      name: 'Operations Director',
-      email: 'ops.director@company.internal',
-      role: 'Operations Lead',
-      department: 'Executive Hub',
-      rememberMe: true
-    };
+    // Default logged-in user for fast experience removed to enforce auth
+    return null;
   });
 
   // Dark Mode
