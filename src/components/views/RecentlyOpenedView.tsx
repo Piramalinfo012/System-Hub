@@ -62,28 +62,28 @@ export const RecentlyOpenedView: React.FC<RecentlyOpenedViewProps> = ({
     switch (type) {
       case 'step':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${darkMode ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'bg-cyan-100 text-cyan-700 border-cyan-300'}`}>
             <Workflow className="w-3 h-3" />
             {header || 'STEP WORKFLOW'}
           </span>
         );
       case 'sheet':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${darkMode ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-emerald-100 text-emerald-700 border-emerald-300'}`}>
             <FileSpreadsheet className="w-3 h-3" />
             SHEET
           </span>
         );
       case 'dashboard':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${darkMode ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-amber-100 text-amber-700 border-amber-300'}`}>
             <BarChart3 className="w-3 h-3" />
             DASHBOARD
           </span>
         );
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/10 text-blue-400 border border-blue-500/30">
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${darkMode ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : 'bg-blue-100 text-blue-700 border-blue-300'}`}>
             <Layers className="w-3 h-3" />
             SYSTEM
           </span>
@@ -137,20 +137,20 @@ export const RecentlyOpenedView: React.FC<RecentlyOpenedViewProps> = ({
               }`}
             >
               <div className="flex items-start sm:items-center gap-3 min-w-0">
-                <div className="p-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-cyan-400 shrink-0">
+                <div className={`p-2.5 rounded-xl border shrink-0 ${darkMode ? 'bg-slate-800 border-slate-700/50 text-cyan-400' : 'bg-slate-100 border-slate-200 text-cyan-600'}`}>
                   <ExternalLink className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h4 className="text-sm font-bold truncate text-slate-100 dark:text-slate-100">
+                    <h4 className={`text-sm font-bold truncate ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
                       {item.title}
                     </h4>
                     {getTypeBadge(item.type, item.stepHeader)}
-                    <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-800/80 text-slate-400">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${darkMode ? 'bg-slate-800/80 text-slate-400' : 'bg-slate-100 text-slate-600'}`}>
                       {item.department}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 font-mono truncate mt-0.5">
+                  <p className={`text-xs font-mono truncate mt-0.5 ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>
                     {item.url}
                   </p>
                 </div>
@@ -179,7 +179,7 @@ export const RecentlyOpenedView: React.FC<RecentlyOpenedViewProps> = ({
           darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'
         }`}>
           <Clock className="w-10 h-10 mx-auto text-slate-600 mb-3" />
-          <h3 className="text-base font-bold">No recently opened items</h3>
+          <h3 className={`text-base font-bold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>No recently opened items</h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
             Whenever you launch a system, step workflow, sheet, or dashboard, it will appear here for fast re-access.
           </p>

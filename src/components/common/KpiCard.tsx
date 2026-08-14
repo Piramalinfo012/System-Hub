@@ -50,42 +50,42 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   const colorStyles = {
     cyan: {
       border: darkMode ? 'border-cyan-500/30 hover:border-cyan-400' : 'border-cyan-200',
-      iconBg: 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30',
+      iconBg: darkMode ? 'bg-cyan-500/15 text-cyan-400 border border-cyan-500/30' : 'bg-cyan-100 text-cyan-700 border border-cyan-200',
       glow: 'hover:shadow-cyan-500/20',
-      accent: 'text-cyan-400',
-      tag: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
+      accent: darkMode ? 'text-cyan-400' : 'text-cyan-700',
+      tag: darkMode ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'bg-cyan-100 text-cyan-700 border-cyan-300',
       corner: '#00f0ff'
     },
     blue: {
       border: darkMode ? 'border-blue-500/30 hover:border-blue-400' : 'border-blue-200',
-      iconBg: 'bg-blue-500/15 text-blue-400 border border-blue-500/30',
+      iconBg: darkMode ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30' : 'bg-blue-100 text-blue-700 border border-blue-200',
       glow: 'hover:shadow-blue-500/20',
-      accent: 'text-blue-400',
-      tag: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+      accent: darkMode ? 'text-blue-400' : 'text-blue-700',
+      tag: darkMode ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' : 'bg-blue-100 text-blue-700 border-blue-300',
       corner: '#38bdf8'
     },
     indigo: {
       border: darkMode ? 'border-indigo-500/30 hover:border-indigo-400' : 'border-indigo-200',
-      iconBg: 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30',
+      iconBg: darkMode ? 'bg-indigo-500/15 text-indigo-400 border border-indigo-500/30' : 'bg-indigo-100 text-indigo-700 border border-indigo-200',
       glow: 'hover:shadow-indigo-500/20',
-      accent: 'text-indigo-400',
-      tag: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30',
+      accent: darkMode ? 'text-indigo-400' : 'text-indigo-700',
+      tag: darkMode ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' : 'bg-indigo-100 text-indigo-700 border-indigo-300',
       corner: '#818cf8'
     },
     emerald: {
       border: darkMode ? 'border-emerald-500/30 hover:border-emerald-400' : 'border-emerald-200',
-      iconBg: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
+      iconBg: darkMode ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' : 'bg-emerald-100 text-emerald-700 border border-emerald-200',
       glow: 'hover:shadow-emerald-500/20',
-      accent: 'text-emerald-400',
-      tag: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
+      accent: darkMode ? 'text-emerald-400' : 'text-emerald-700',
+      tag: darkMode ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-emerald-100 text-emerald-700 border-emerald-300',
       corner: '#00ff9d'
     },
     amber: {
       border: darkMode ? 'border-amber-500/30 hover:border-amber-400' : 'border-amber-200',
-      iconBg: 'bg-amber-500/15 text-amber-400 border border-amber-500/30',
+      iconBg: darkMode ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30' : 'bg-amber-100 text-amber-700 border border-amber-200',
       glow: 'hover:shadow-amber-500/20',
-      accent: 'text-amber-400',
-      tag: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+      accent: darkMode ? 'text-amber-400' : 'text-amber-700',
+      tag: darkMode ? 'bg-amber-500/10 text-amber-400 border-amber-500/30' : 'bg-amber-100 text-amber-700 border-amber-300',
       corner: '#ffb703'
     }
   }[colorScheme];
@@ -115,7 +115,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
         <div>
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-            <p className={`text-[10px] font-mono uppercase tracking-widest font-bold ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`text-[10px] font-mono uppercase tracking-widest font-bold ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
               {title}
             </p>
           </div>
@@ -137,7 +137,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
             <span className="w-1 h-3 rounded-full bg-cyan-400/60 animate-wave-2"></span>
             <span className="w-1 h-1.5 rounded-full bg-cyan-400/90 animate-wave-3"></span>
             <span className="w-1 h-2.5 rounded-full bg-cyan-400/50 animate-wave-4"></span>
-            <p className={`text-xs ml-1.5 truncate font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-xs ml-1.5 truncate font-medium ${darkMode ? 'text-slate-400' : 'text-slate-700'}`}>
               {subtitle}
             </p>
           </div>
@@ -153,9 +153,9 @@ export const KpiCard: React.FC<KpiCardProps> = ({
       </div>
 
       {onClick && (
-        <div className="mt-3 pt-2 border-t border-slate-800/60 flex items-center justify-between text-[10px] font-mono text-cyan-400 opacity-80 group-hover:opacity-100 transition-opacity">
+        <div className={`mt-3 pt-2 border-t flex items-center justify-between text-[10px] font-mono opacity-80 group-hover:opacity-100 transition-opacity ${darkMode ? 'border-slate-800/60 text-cyan-400' : 'border-slate-200 text-cyan-700'}`}>
           <span className="flex items-center gap-1">
-            <Activity className="w-3 h-3 text-cyan-400" />
+            <Activity className={`w-3 h-3 ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`} />
             <span>ACCESS_HUD</span>
           </span>
           <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />

@@ -56,11 +56,32 @@ body {
 }
 
 .cyber-grid-light {
-  background-size: 32px 32px;
+  background-size: 32px 32px, 32px 32px, 100% 100%;
   background-image: 
     linear-gradient(to right, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+    linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+    linear-gradient(135deg, #fdfbfb 0%, #ebedee 50%, #e0c3fc 100%);
+  background-attachment: fixed;
   animation: cyber-grid-drift 20s linear infinite;
+}
+
+/* Global Glassmorphism overrides for Light Mode */
+.cyber-grid-light .bg-white,
+.cyber-grid-light .bg-slate-50,
+.cyber-grid-light .bg-slate-100 {
+  background-color: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(20px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05) !important;
+}
+
+.cyber-grid-light input,
+.cyber-grid-light select,
+.cyber-grid-light textarea {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+  border-color: rgba(255, 255, 255, 0.8) !important;
 }
 
 .cyber-dots {

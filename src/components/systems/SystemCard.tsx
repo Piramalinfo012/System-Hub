@@ -62,14 +62,14 @@ export const SystemCard: React.FC<SystemCardProps> = ({
   // Department Badge Colors
   const getDeptColor = (dept: string) => {
     const d = dept.toUpperCase();
-    if (d.includes('CRM') || d.includes('SALES')) return 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40 shadow-xs shadow-cyan-500/10';
-    if (d.includes('HR')) return 'bg-pink-500/15 text-pink-300 border-pink-500/40 shadow-xs shadow-pink-500/10';
-    if (d.includes('PURCHASE') || d.includes('PROCURE')) return 'bg-indigo-500/15 text-indigo-300 border-indigo-500/40 shadow-xs shadow-indigo-500/10';
-    if (d.includes('STORE') || d.includes('INVENTORY')) return 'bg-amber-500/15 text-amber-300 border-amber-500/40 shadow-xs shadow-amber-500/10';
-    if (d.includes('TRANSPORT') || d.includes('FLEET')) return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-xs shadow-emerald-500/10';
-    if (d.includes('ADMIN') || d.includes('FINANCE')) return 'bg-purple-500/15 text-purple-300 border-purple-500/40 shadow-xs shadow-purple-500/10';
-    if (d.includes('SECURITY')) return 'bg-rose-500/15 text-rose-300 border-rose-500/40 shadow-xs shadow-rose-500/10';
-    return 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40 shadow-xs';
+    if (d.includes('CRM') || d.includes('SALES')) return darkMode ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40 shadow-xs shadow-cyan-500/10' : 'bg-cyan-100 text-cyan-700 border-cyan-300 shadow-cyan-200/50';
+    if (d.includes('HR')) return darkMode ? 'bg-pink-500/15 text-pink-300 border-pink-500/40 shadow-xs shadow-pink-500/10' : 'bg-pink-100 text-pink-700 border-pink-300 shadow-pink-200/50';
+    if (d.includes('PURCHASE') || d.includes('PROCURE')) return darkMode ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/40 shadow-xs shadow-indigo-500/10' : 'bg-indigo-100 text-indigo-700 border-indigo-300 shadow-indigo-200/50';
+    if (d.includes('STORE') || d.includes('INVENTORY')) return darkMode ? 'bg-amber-500/15 text-amber-300 border-amber-500/40 shadow-xs shadow-amber-500/10' : 'bg-amber-100 text-amber-700 border-amber-300 shadow-amber-200/50';
+    if (d.includes('TRANSPORT') || d.includes('FLEET')) return darkMode ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-xs shadow-emerald-500/10' : 'bg-emerald-100 text-emerald-700 border-emerald-300 shadow-emerald-200/50';
+    if (d.includes('ADMIN') || d.includes('FINANCE')) return darkMode ? 'bg-purple-500/15 text-purple-300 border-purple-500/40 shadow-xs shadow-purple-500/10' : 'bg-purple-100 text-purple-700 border-purple-300 shadow-purple-200/50';
+    if (d.includes('SECURITY')) return darkMode ? 'bg-rose-500/15 text-rose-300 border-rose-500/40 shadow-xs shadow-rose-500/10' : 'bg-rose-100 text-rose-700 border-rose-300 shadow-rose-200/50';
+    return darkMode ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40 shadow-xs' : 'bg-cyan-100 text-cyan-700 border-cyan-300 shadow-xs';
   };
 
   // System Type Icon
@@ -122,7 +122,7 @@ export const SystemCard: React.FC<SystemCardProps> = ({
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border uppercase tracking-wider ${getDeptColor(system.department)}`}>
                 {system.department}
               </span>
-              <span className={`text-[10px] font-mono font-semibold ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+              <span className={`text-[10px] font-mono font-semibold ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>
                 #{system.sr}
               </span>
             </div>
@@ -158,7 +158,7 @@ export const SystemCard: React.FC<SystemCardProps> = ({
         </div>
 
         {/* Status Telemetry & Live Heartbeat */}
-        <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between gap-2">
+        <div className={`mt-4 pt-3 border-t flex items-center justify-between gap-2 ${darkMode ? 'border-slate-800/60' : 'border-slate-200'}`}>
           <div className="flex items-center gap-1.5">
             <HeartbeatIndicator
               status={localHeartbeat}

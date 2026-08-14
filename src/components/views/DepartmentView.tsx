@@ -57,14 +57,16 @@ export const DepartmentView: React.FC<DepartmentViewProps> = ({
                 darkMode ? 'bg-slate-900/70 border-slate-800' : 'bg-white border-slate-200'
               }`}
             >
-              <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-800/60">
+              <div className={`flex items-center justify-between pb-4 mb-4 border-b ${darkMode ? 'border-slate-800/60' : 'border-slate-200'}`}>
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 flex items-center justify-center font-bold text-sm">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm border ${
+                    darkMode ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' : 'bg-cyan-100 text-cyan-700 border-cyan-300'
+                  }`}>
                     {dept.substring(0, 2).toUpperCase()}
                   </div>
                   <div>
-                    <h3 className="text-base font-bold tracking-tight">{dept} DEPARTMENT</h3>
-                    <p className="text-xs text-slate-400">
+                    <h3 className={`text-base font-bold tracking-tight ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>{dept} DEPARTMENT</h3>
+                    <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                       {deptSystems.length} systems • {deptSystems.reduce((s, x) => s + x.steps.length, 0)} workflow steps
                     </p>
                   </div>
@@ -72,7 +74,9 @@ export const DepartmentView: React.FC<DepartmentViewProps> = ({
 
                 <button
                   onClick={() => onSelectDepartmentFilter(dept)}
-                  className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+                  className={`text-xs font-semibold flex items-center gap-1 ${
+                    darkMode ? 'text-cyan-400 hover:text-cyan-300' : 'text-cyan-600 hover:text-cyan-700'
+                  }`}
                 >
                   <span>Filter Grid</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -93,21 +97,25 @@ export const DepartmentView: React.FC<DepartmentViewProps> = ({
                         : 'bg-slate-50 border-slate-200 hover:border-cyan-400 hover:shadow-md'
                     }`}
                   >
-                    <span className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-cyan-400/60 opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    <span className={`absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 opacity-0 group-hover:opacity-100 transition-opacity ${darkMode ? 'border-cyan-400/60' : 'border-cyan-500'}`}></span>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded border ${
+                        darkMode ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30' : 'bg-cyan-100 text-cyan-700 border-cyan-300'
+                      }`}>
                         {system.systemType}
                       </span>
-                      <span className="text-xs font-mono text-cyan-400 font-bold">
+                      <span className={`text-xs font-mono font-bold ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`}>
                         {system.steps.length} Steps
                       </span>
                     </div>
 
-                    <h4 className="text-sm font-bold text-slate-100 group-hover:text-cyan-300 transition-colors line-clamp-1">
+                    <h4 className={`text-sm font-bold transition-colors line-clamp-1 ${
+                      darkMode ? 'text-slate-100 group-hover:text-cyan-300' : 'text-slate-800 group-hover:text-cyan-700'
+                    }`}>
                       {system.systemName}
                     </h4>
                     {system.doer && (
-                      <p className="text-xs text-slate-400 mt-1 truncate">
+                      <p className={`text-xs mt-1 truncate ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                         👤 {system.doer}
                       </p>
                     )}

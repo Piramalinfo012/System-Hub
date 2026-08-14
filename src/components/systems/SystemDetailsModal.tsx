@@ -141,10 +141,10 @@ export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold border ${darkMode ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' : 'bg-cyan-100 text-cyan-700 border-cyan-300'}`}>
                   {system.department}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
+                <span className={`px-2.5 py-0.5 rounded-md text-xs font-medium border ${darkMode ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-200 text-slate-700 border-slate-300'}`}>
                   {system.systemType}
                 </span>
                 <HeartbeatIndicator 
@@ -167,16 +167,16 @@ export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
               onClick={() => onToggleFavorite(system.id)}
               className={`p-2.5 rounded-xl border transition-all ${
                 isFavorite
-                  ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-400'
-                  : 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-slate-200'
+                  ? darkMode ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-400' : 'bg-yellow-100 border-yellow-300 text-yellow-600'
+                  : darkMode ? 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-slate-200' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900'
               }`}
               title="Toggle Favorite"
             >
-              <Star className={`w-4 h-4 ${isFavorite ? 'fill-yellow-400' : ''}`} />
+              <Star className={`w-4 h-4 ${isFavorite ? darkMode ? 'fill-yellow-400' : 'fill-yellow-500' : ''}`} />
             </button>
             <button
               onClick={onClose}
-              className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-400 hover:text-slate-200 transition-colors"
+              className={`p-2.5 rounded-xl border transition-colors ${darkMode ? 'bg-slate-800/80 border-slate-700 text-slate-400 hover:text-slate-200' : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900'}`}
               title="Close modal"
             >
               <X className="w-4 h-4" />
@@ -239,16 +239,16 @@ export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
                 disabled={!hasSoftwareUrl}
                 className={`p-4 rounded-2xl border flex flex-col justify-between text-left transition-all ${
                   hasSoftwareUrl
-                    ? 'bg-linear-to-br from-cyan-600/20 via-blue-600/10 to-indigo-600/20 border-cyan-500/40 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/10'
-                    : 'bg-slate-800/30 border-slate-800 opacity-50 cursor-not-allowed'
+                    ? darkMode ? 'bg-linear-to-br from-cyan-600/20 via-blue-600/10 to-indigo-600/20 border-cyan-500/40 hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/10' : 'bg-cyan-50 border-cyan-200 hover:border-cyan-400 hover:shadow-md'
+                    : darkMode ? 'bg-slate-800/30 border-slate-800 opacity-50 cursor-not-allowed' : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-cyan-400">Main Application</span>
-                  <ExternalLink className="w-4 h-4 text-cyan-400" />
+                  <span className={`text-xs font-semibold ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`}>Main Application</span>
+                  <ExternalLink className={`w-4 h-4 ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`} />
                 </div>
-                <p className="text-sm font-bold truncate">{system.systemName}</p>
-                <span className="text-[11px] text-slate-400 mt-1">
+                <p className={`text-sm font-bold truncate ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>{system.systemName}</p>
+                <span className={`text-[11px] mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                   {hasSoftwareUrl ? 'Open Software ↗' : 'URL Not Available'}
                 </span>
               </button>
@@ -259,16 +259,16 @@ export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
                 disabled={!hasSheetUrl}
                 className={`p-4 rounded-2xl border flex flex-col justify-between text-left transition-all ${
                   hasSheetUrl
-                    ? 'bg-emerald-500/10 border-emerald-500/40 hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/10'
-                    : 'bg-slate-800/30 border-slate-800 opacity-50 cursor-not-allowed'
+                    ? darkMode ? 'bg-emerald-500/10 border-emerald-500/40 hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-500/10' : 'bg-emerald-50 border-emerald-200 hover:border-emerald-400 hover:shadow-md'
+                    : darkMode ? 'bg-slate-800/30 border-slate-800 opacity-50 cursor-not-allowed' : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-emerald-400">Google Sheet</span>
-                  <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                  <span className={`text-xs font-semibold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>Google Sheet</span>
+                  <FileSpreadsheet className={`w-4 h-4 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
                 </div>
-                <p className="text-sm font-bold truncate">Database Sheet</p>
-                <span className="text-[11px] text-slate-400 mt-1">
+                <p className={`text-sm font-bold truncate ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>Database Sheet</p>
+                <span className={`text-[11px] mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                   {hasSheetUrl ? 'Open Sheet ↗' : 'Sheet Not Available'}
                 </span>
               </button>
@@ -279,16 +279,16 @@ export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
                 disabled={!hasDashboardUrl}
                 className={`p-4 rounded-2xl border flex flex-col justify-between text-left transition-all ${
                   hasDashboardUrl
-                    ? 'bg-amber-500/10 border-amber-500/40 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/10'
-                    : 'bg-slate-800/30 border-slate-800 opacity-50 cursor-not-allowed'
+                    ? darkMode ? 'bg-amber-500/10 border-amber-500/40 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-500/10' : 'bg-amber-50 border-amber-200 hover:border-amber-400 hover:shadow-md'
+                    : darkMode ? 'bg-slate-800/30 border-slate-800 opacity-50 cursor-not-allowed' : 'bg-slate-100 border-slate-200 opacity-50 cursor-not-allowed'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-amber-400">BI Dashboard</span>
-                  <BarChart3 className="w-4 h-4 text-amber-400" />
+                  <span className={`text-xs font-semibold ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>BI Dashboard</span>
+                  <BarChart3 className={`w-4 h-4 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
                 </div>
-                <p className="text-sm font-bold truncate">Executive Report</p>
-                <span className="text-[11px] text-slate-400 mt-1">
+                <p className={`text-sm font-bold truncate ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>Executive Report</p>
+                <span className={`text-[11px] mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                   {hasDashboardUrl ? 'Open Dashboard ↗' : 'Dashboard Not Available'}
                 </span>
               </button>
@@ -307,19 +307,19 @@ export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
               <div>
                 <p className="text-slate-500 font-medium">Department</p>
-                <p className="font-semibold text-sm mt-0.5">{system.department}</p>
+                <p className={`font-semibold text-sm mt-0.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{system.department}</p>
               </div>
               <div>
                 <p className="text-slate-500 font-medium">Assigned Doer</p>
-                <p className="font-semibold text-sm mt-0.5">{system.doer || 'Unassigned'}</p>
+                <p className={`font-semibold text-sm mt-0.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{system.doer || 'Unassigned'}</p>
               </div>
               <div>
                 <p className="text-slate-500 font-medium">System Type</p>
-                <p className="font-semibold text-sm mt-0.5">{system.systemType}</p>
+                <p className={`font-semibold text-sm mt-0.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{system.systemType}</p>
               </div>
               <div>
                 <p className="text-slate-500 font-medium">Index Reference (SR)</p>
-                <p className="font-semibold text-sm font-mono mt-0.5">#{system.sr}</p>
+                <p className={`font-semibold text-sm font-mono mt-0.5 ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>#{system.sr}</p>
               </div>
             </div>
           </div>
@@ -347,7 +347,9 @@ export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium transition-colors"
+            className={`px-4 py-2 rounded-xl font-medium transition-colors ${
+              darkMode ? 'bg-slate-800 hover:bg-slate-700 text-slate-200' : 'bg-slate-200 hover:bg-slate-300 text-slate-800'
+            }`}
           >
             Close Details
           </button>

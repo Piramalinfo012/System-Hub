@@ -54,6 +54,22 @@ export const Header: React.FC<HeaderProps> = ({
   const [showNotifications, setShowNotifications] = useState(false);
   const [refreshSuccessToast, setRefreshSuccessToast] = useState(false);
 
+  const profileMenuRef = React.useRef<HTMLDivElement>(null);
+  const notificationsRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleRefreshClick = () => {
     onRefreshData();
     setRefreshSuccessToast(true);
@@ -113,8 +129,18 @@ export const Header: React.FC<HeaderProps> = ({
             </motion.div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-extrabold tracking-wider font-mono text-base sm:text-lg leading-tight cyber-gradient-text">
-                  DIGITAL SYSTEM HUB
+                <span className="font-extrabold tracking-wider font-mono text-base sm:text-lg leading-tight cyber-gradient-text inline-block">
+                  {"DIGITAL SYSTEM HUB".split("").map((char, index) => (
+                    <motion.span
+                      key={index}
+                      initial={{ opacity: 0, filter: 'blur(4px)' }}
+                      animate={{ opacity: 1, filter: 'blur(0px)' }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                      style={{ whiteSpace: 'pre' }}
+                    >
+                      {char}
+                    </motion.span>
+                  ))}
                 </span>
                 <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 shadow-xs shadow-cyan-500/20">
                   <div className="flex items-end gap-[2px] h-3">
@@ -146,7 +172,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${dataSource === 'GOOGLE_APPS_SCRIPT' ? 'bg-emerald-400' : 'bg-cyan-400'}`}></span>
               <span className={`relative inline-flex rounded-full h-2 w-2 ${dataSource === 'GOOGLE_APPS_SCRIPT' ? 'bg-emerald-400' : 'bg-cyan-400'}`}></span>
             </span>
-            <span>{dataSource === 'GOOGLE_APPS_SCRIPT' ? 'LIVE_SHEET_API' : 'LOCAL_SIMULATOR'}</span>
+            <span>{dataSource === 'GOOGLE_APPS_SCRIPT' ? 'LIVE_API' : 'LOCAL_SIMULATOR'}</span>
           </button>
         </div>
 
@@ -215,7 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="absolute right-0 top-full mt-2 z-50 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 text-xs font-mono font-bold shadow-lg shadow-emerald-500/20 whitespace-nowrap"
               >
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                SHEET_SYNC_OK
+                SYNC_OK
               </motion.div>
             )}
           </div>
@@ -224,7 +250,7 @@ export const Header: React.FC<HeaderProps> = ({
           <ThemeToggle darkMode={darkMode} onToggle={onToggleTheme} />
 
           {/* Notifications */}
-          <div className="relative">
+          <div className="relative" ref={notificationsRef}>
             <motion.button
               whileTap={{ scale: 0.95 }}
               id="header-notifications-button"
@@ -281,7 +307,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* User Profile Dropdown */}
-          <div className="relative">
+          <div className="relative" ref={profileMenuRef}>
             <motion.button
               whileTap={{ scale: 0.96 }}
               id="header-user-profile-button"
@@ -327,10 +353,10 @@ export const Header: React.FC<HeaderProps> = ({
                         setShowProfileMenu(false);
                         onOpenAppsScriptStudio();
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left hover:bg-cyan-500/15 hover:text-cyan-300 transition-colors"
+                      className="hidden w-full items-center gap-2.5 px-3 py-2 rounded-xl text-left hover:bg-cyan-500/15 hover:text-cyan-300 transition-colors"
                     >
                       <FileSpreadsheet className="w-4 h-4 text-cyan-400" />
-                      <span className="font-mono text-xs">Apps Script & Sheet Setup</span>
+                      <span className="font-mono text-xs">Apps Script Setup</span>
                     </button>
 
                     <button
@@ -338,7 +364,7 @@ export const Header: React.FC<HeaderProps> = ({
                         setShowProfileMenu(false);
                         onOpenSettings();
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-left hover:bg-slate-800 transition-colors"
+                      className="hidden w-full items-center gap-2.5 px-3 py-2 rounded-xl text-left hover:bg-slate-800 transition-colors"
                     >
                       <Sliders className="w-4 h-4 text-slate-400" />
                       <span className="font-mono text-xs">Portal Settings & API</span>
@@ -361,6 +387,20 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </AnimatePresence>
           </div>
+
+          {/* Direct Logout Button */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={onLogout}
+            className={`p-2 rounded-xl border transition-all ${
+              darkMode
+                ? 'bg-slate-900 border-slate-800 text-rose-400 hover:border-rose-500/40 hover:bg-rose-950/30'
+                : 'bg-slate-100 border-slate-300 text-rose-500 hover:bg-rose-100'
+            }`}
+            title="Logout"
+          >
+            <LogOut className="w-4 h-4" />
+          </motion.button>
 
         </div>
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { 
+  Home,
   LayoutDashboard, 
   Layers, 
   MessageSquare,
@@ -16,7 +17,9 @@ import {
   ExternalLink,
   ShieldCheck,
   Activity,
-  Terminal
+  Terminal,
+  Mail,
+  Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ActiveTab } from '../../types';
@@ -52,6 +55,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems = [
     {
+      id: 'home' as ActiveTab,
+      label: 'Home',
+      icon: Home,
+      badge: null,
+      color: 'text-blue-400',
+      tag: 'HOME'
+    },
+    {
       id: 'dashboard' as ActiveTab,
       label: 'Command Center',
       icon: LayoutDashboard,
@@ -74,6 +85,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: 'LIVE',
       color: 'text-emerald-400',
       tag: 'BOT'
+    },
+    {
+      id: 'email_master' as ActiveTab,
+      label: 'Email Master',
+      icon: Mail,
+      badge: null,
+      color: 'text-rose-400',
+      tag: 'EMAIL'
+    },
+    {
+      id: 'all_contacts' as ActiveTab,
+      label: 'All Contacts',
+      icon: Users,
+      badge: null,
+      color: 'text-orange-400',
+      tag: 'CONTACTS'
     },
     {
       id: 'departments' as ActiveTab,
@@ -114,22 +141,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
       badge: null,
       color: 'text-purple-400',
       tag: 'METRICS'
-    },
-    {
-      id: 'apps_script' as ActiveTab,
-      label: 'Apps Script & Sheet',
-      icon: FileCode2,
-      badge: 'API',
-      color: 'text-teal-400',
-      tag: 'ENGINE'
-    },
-    {
-      id: 'settings' as ActiveTab,
-      label: 'Settings & Config',
-      icon: Settings,
-      badge: null,
-      color: 'text-slate-400',
-      tag: 'CONFIG'
     }
   ];
 
@@ -162,22 +173,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }`}
                 title={isCollapsed ? item.label : undefined}
               >
-                <Icon className={`w-4 h-4 shrink-0 transition-transform duration-150 ${isActive ? item.color : 'text-slate-400 group-hover:scale-110 group-hover:text-cyan-400'}`} />
+                <Icon className={`relative z-10 w-4 h-4 shrink-0 transition-transform duration-150 ${isActive ? item.color : 'text-slate-400 group-hover:scale-110 group-hover:text-cyan-400'}`} />
                 
                 {!isCollapsed && (
-                  <span className="truncate flex-1 text-left font-medium">{item.label}</span>
+                  <span className="relative z-10 truncate flex-1 text-left font-medium">{item.label}</span>
                 )}
 
                 {!isCollapsed && item.badge !== null && (
                   <span
-                    className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold transition-all ${
+                    className={`relative z-10 text-[10px] font-mono px-2 py-0.5 rounded-full font-bold transition-all ${
                       typeof item.badge === 'string'
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-xs'
+                        ? darkMode ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-xs' : 'bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-xs'
                         : isActive
-                        ? 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/30'
+                        ? darkMode ? 'bg-cyan-500/25 text-cyan-200 border border-cyan-400/30' : 'bg-cyan-100 text-cyan-800 border border-cyan-300'
                         : darkMode
                         ? 'bg-slate-900 text-slate-400 border border-slate-800'
-                        : 'bg-slate-200 text-slate-700'
+                        : 'bg-slate-200 text-slate-700 border border-slate-300'
                     }`}
                   >
                     {item.badge}
@@ -190,7 +201,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <motion.div 
                       layoutId="sidebar-active-bg"
                       transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                      className={`absolute inset-0 rounded-xl ${
+                      className={`absolute inset-0 rounded-xl z-0 ${
                         darkMode
                           ? 'bg-linear-to-r from-cyan-500/20 via-cyan-500/10 to-transparent border border-cyan-500/40 shadow-sm shadow-cyan-500/15'
                           : 'bg-cyan-50 border border-cyan-300'
@@ -215,22 +226,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className={`p-3 rounded-2xl border relative overflow-hidden ${
             darkMode ? 'bg-slate-900/80 border-slate-800/90 backdrop-blur-md' : 'bg-slate-100 border-slate-200'
           }`}>
-            <span className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-cyan-400"></span>
+            <span className={`absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 ${darkMode ? 'border-cyan-400' : 'border-cyan-600'}`}></span>
             <div className="flex items-center gap-2 mb-1.5">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-cyan-300">
+              <ShieldCheck className={`w-4 h-4 ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+              <span className={`text-[11px] font-mono font-bold uppercase tracking-wider ${darkMode ? 'text-cyan-300' : 'text-cyan-700'}`}>
                 SOURCE_OF_TRUTH
               </span>
             </div>
             <p className={`text-[11px] leading-relaxed font-sans ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-              Real-time Google Sheet synchronization active.
+              Real-time Data synchronization active.
             </p>
-            <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[10px] font-mono">
-              <span className="text-cyan-400 font-bold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            <div className={`mt-2.5 pt-2 border-t flex items-center justify-between text-[10px] font-mono ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+              <span className={`font-bold flex items-center gap-1 ${darkMode ? 'text-cyan-400' : 'text-cyan-700'}`}>
+                <span className={`w-1.5 h-1.5 rounded-full animate-ping ${darkMode ? 'bg-cyan-400' : 'bg-cyan-600'}`}></span>
                 CYBER_INDEX 3.0
               </span>
-              <span className="text-emerald-400 font-bold">100% SYNC</span>
+              <span className={`font-bold ${darkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>100% SYNC</span>
             </div>
           </div>
         ) : (

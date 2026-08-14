@@ -386,16 +386,16 @@ export class GoogleSheetService {
   }
 
   /**
-   * Get target Sheet Name from storage or default "Data"
+   * Get target Sheet Name from storage or default "SYSTEM"
    */
   static getSheetName(): string {
-    if (typeof window === 'undefined') return 'Data';
-    return localStorage.getItem(DEFAULT_SHEET_NAME_KEY) || 'Data';
+    if (typeof window === 'undefined') return 'SYSTEM';
+    return localStorage.getItem(DEFAULT_SHEET_NAME_KEY) || 'SYSTEM';
   }
 
   static setSheetName(name: string): void {
     if (typeof window === 'undefined') return;
-    localStorage.setItem(DEFAULT_SHEET_NAME_KEY, (name || 'Data').trim());
+    localStorage.setItem(DEFAULT_SHEET_NAME_KEY, (name || 'SYSTEM').trim());
   }
 
   /**
@@ -537,6 +537,57 @@ export class GoogleSheetService {
 
     // Fallback or Local Simulated Database Engine
     return this.getSimulatedSheetData();
+  }
+
+  /**
+   * Fetch users from the "User" tab in Google Sheet
+   */
+  static async fetchUsers(): Promise<any[]> {
+    const apiUrl = this.getConfiguredApiUrl();
+    if (!apiUrl || !this.isValidUrl(apiUrl)) {
+      return [];
+    }
+
+    try {
+      const fetchUrl = new URL(apiUrl);
+      fetchUrl.searchParams.set('sheet', 'User');
+      
+      const response = await fetch(fetchUrl.toString(), {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (!response.ok) return [];
+      
+      const json = await response.json();
+      const data = json.data || (Array.isArray(json) ? json : []);
+      
+      if (Array.isArray(data) && data.length > 0 && Array.isArray(data[0])) {
+        const headers = data[0].map((h: any) => String(h || '').trim().toLowerCase());
+        const idIdx = headers.indexOf('id');
+        const passIdx = headers.indexOf('password');
+        const nameIdx = headers.indexOf('name');
+        const roleIdx = headers.indexOf('role');
+        const deptIdx = headers.indexOf('department');
+        
+        const users = [];
+        for (let i = 1; i < data.length; i++) {
+          const row = data[i];
+          if (idIdx !== -1 && row[idIdx]) {
+            users.push({
+              email: String(row[idIdx]).trim(),
+              password: passIdx !== -1 ? String(row[passIdx]).trim() : '',
+              name: nameIdx !== -1 ? String(row[nameIdx]).trim() : 'User',
+              role: roleIdx !== -1 ? String(row[roleIdx]).trim() : 'Team Member',
+              department: deptIdx !== -1 ? String(row[deptIdx]).trim() : 'General'
+            });
+          }
+        }
+        return users;
+      }
+      return [{ email: 'Admin', password: 'Admin123', name: 'Admin User', role: 'Admin', department: 'Executive Hub' }];
+    } catch (err) {
+      console.error('[Digital System Hub] Failed to fetch users:', err);
+      return [{ email: 'Admin', password: 'Admin123', name: 'Admin User', role: 'Admin', department: 'Executive Hub' }];
+    }
   }
 
   /**
@@ -697,7 +748,7 @@ export class GoogleSheetService {
         departments: processed.departments,
         systemTypes: processed.systemTypes,
         detectedStepColumns: processed.detectedStepColumns,
-        sheetName: this.getSheetName() || 'Data',
+        sheetName: this.getSheetName() || 'SYSTEM',
         lastUpdated: new Date().toISOString(),
         source: 'SIMULATOR'
       }
@@ -1321,6 +1372,179 @@ export class GoogleSheetService {
     current.unshift(newItem);
     this.saveWhatsappAutomations(current);
   }
+
+  // --- Email Master & All Contacts Service Methods ---
+  static async fetchEmailMaster(forceReload = false): Promise<{ success: boolean; data: any[]; error?: string }> {
+    const apiUrl = this.getConfiguredApiUrl();
+    if (apiUrl && this.isValidUrl(apiUrl)) {
+      try {
+        const fetchUrl = new URL(apiUrl);
+        fetchUrl.searchParams.set('sheet', 'Email Master');
+        if (forceReload) fetchUrl.searchParams.set('_t', Date.now().toString());
+
+        const response = await fetch(fetchUrl.toString(), {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (response.ok) {
+          const json = await response.json();
+          let rawRows: any[] = [];
+          if (json && json.success && Array.isArray(json.data)) {
+            rawRows = json.data;
+          } else if (Array.isArray(json)) {
+            rawRows = json;
+          }
+          if (rawRows.length > 0) {
+            return { success: true, data: this.parseEmailMasterRows(rawRows) };
+          }
+        }
+      } catch (err) {
+        console.warn('Live Email Master fetch failed:', err);
+      }
+    }
+    return { success: true, data: [] };
+  }
+
+  static parseEmailMasterRows(rawRows: any[]): any[] {
+    if (!Array.isArray(rawRows) || rawRows.length === 0) return [];
+    const items: any[] = [];
+
+    if (Array.isArray(rawRows[0])) {
+      // 2D Array format
+      for (let i = 1; i < rawRows.length; i++) {
+        const row = rawRows[i];
+        if (!Array.isArray(row)) continue;
+        if (!row[0] && !row[2]) continue; // Skip if no name and no email ID
+        items.push({
+          id: `em_${i}`,
+          rowIndex: i + 1,
+          personName: String(row[0] || '').trim(),
+          department: String(row[1] || '').trim(),
+          emailId: String(row[2] || '').trim(),
+          password: String(row[3] || '').trim(),
+          usingMobileNumberForMaking: String(row[4] || '').trim(),
+          recoveryMail: String(row[5] || '').trim(),
+          personUse: String(row[6] || '').trim(),
+          status: String(row[7] || 'Active').trim()
+        });
+      }
+    } else {
+      // Object format
+      rawRows.forEach((row, i) => {
+        if (typeof row === 'object' && row !== null) {
+          items.push({
+            id: `em_${i}`,
+            rowIndex: i + 2,
+            personName: String(row['Person Name'] || row.personName || '').trim(),
+            department: String(row['Department'] || row.department || '').trim(),
+            emailId: String(row['ID'] || row.id || row.emailId || '').trim(),
+            password: String(row['Password'] || row.password || '').trim(),
+            usingMobileNumberForMaking: String(row['Using Mobile Number For Making'] || row.usingMobileNumberForMaking || '').trim(),
+            recoveryMail: String(row['Recovery Mail'] || row.recoveryMail || '').trim(),
+            personUse: String(row['Person Use'] || row.personUse || '').trim(),
+            status: String(row['Status'] || row.status || 'Active').trim()
+          });
+        }
+      });
+    }
+    return items;
+  }
+
+  static async insertEmailMaster(item: {
+    personName: string;
+    department: string;
+    emailId: string;
+    password: string;
+    usingMobileNumberForMaking: string;
+    recoveryMail: string;
+    personUse: string;
+    status: string;
+  }): Promise<void> {
+    try {
+      await this.executePostAction({
+        action: 'insert',
+        sheetName: 'Email Master',
+        rowData: JSON.stringify([
+          item.personName,
+          item.department,
+          item.emailId,
+          item.password,
+          item.usingMobileNumberForMaking,
+          item.recoveryMail,
+          item.personUse,
+          item.status
+        ])
+      });
+    } catch (e) {
+      console.warn('Live Email Master insert failed:', e);
+      throw e;
+    }
+  }
+
+  static async fetchAllContacts(forceReload = false): Promise<{ success: boolean; data: any[]; error?: string; headers?: string[] }> {
+    const apiUrl = this.getConfiguredApiUrl();
+    if (apiUrl && this.isValidUrl(apiUrl)) {
+      try {
+        const fetchUrl = new URL(apiUrl);
+        fetchUrl.searchParams.set('sheet', 'All Contacts');
+        if (forceReload) fetchUrl.searchParams.set('_t', Date.now().toString());
+
+        const response = await fetch(fetchUrl.toString(), {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+        if (response.ok) {
+          const json = await response.json();
+          let rawRows: any[] = [];
+          if (json && json.success && Array.isArray(json.data)) {
+            rawRows = json.data;
+          } else if (Array.isArray(json)) {
+            rawRows = json;
+          }
+          if (rawRows.length > 0) {
+            return this.parseAllContactsRows(rawRows);
+          }
+        }
+      } catch (err) {
+        console.warn('Live All Contacts fetch failed:', err);
+      }
+    }
+    return { success: true, data: [] };
+  }
+
+  static parseAllContactsRows(rawRows: any[]): { success: boolean; data: any[]; headers: string[] } {
+    if (!Array.isArray(rawRows) || rawRows.length === 0) return { success: true, data: [], headers: [] };
+    const items: any[] = [];
+    let headers: string[] = [];
+
+    if (Array.isArray(rawRows[0])) {
+      headers = rawRows[0].map(h => String(h || '').trim());
+      for (let i = 1; i < rawRows.length; i++) {
+        const row = rawRows[i];
+        if (!Array.isArray(row)) continue;
+        const obj: any = { id: `ac_${i}`, rowIndex: i + 1 };
+        let hasData = false;
+        headers.forEach((h, colIdx) => {
+          const val = String(row[colIdx] || '').trim();
+          if (val) hasData = true;
+          obj[h] = val;
+        });
+        if (hasData) items.push(obj);
+      }
+    } else {
+      if (rawRows.length > 0 && typeof rawRows[0] === 'object' && rawRows[0] !== null) {
+        headers = Object.keys(rawRows[0]);
+      }
+      rawRows.forEach((row, i) => {
+        if (typeof row === 'object' && row !== null) {
+          const obj: any = { id: `ac_${i}`, rowIndex: i + 2, ...row };
+          items.push(obj);
+        }
+      });
+    }
+    return { success: true, data: items, headers };
+  }
+
 
   /**
    * Get cached system heartbeats from local storage

@@ -65,7 +65,7 @@ function doGet(e) {
         }
     }
 
-    const sheetName = (e && e.parameter && e.parameter.sheet) ? e.parameter.sheet : "Data";
+    const sheetName = (e && e.parameter && e.parameter.sheet) ? e.parameter.sheet : "SYSTEM";
 
     try {
         const ss = getSpreadsheet();
@@ -130,7 +130,7 @@ function doPost(e) {
             return handleFileUpload(e);
         }
 
-        var sheetName = params.sheetName || 'Data';
+        var sheetName = params.sheetName || 'SYSTEM';
         var ss = getSpreadsheet();
         var sheet = ss.getSheetByName(sheetName);
 

@@ -76,6 +76,30 @@ export interface WhatsappAutomationItem {
   triggersCount?: number;
 }
 
+export interface EmailMasterItem {
+  id: string;
+  rowIndex?: number;
+  personName: string;
+  department: string;
+  emailId: string;
+  password: string;
+  usingMobileNumberForMaking: string;
+  recoveryMail: string;
+  personUse: string;
+  status: string;
+}
+
+export interface AllContactsItem {
+  id: string;
+  rowIndex?: number;
+  name: string;
+  phone: string;
+  email: string;
+  company: string;
+  role: string;
+  [key: string]: any; // Allow generic access for unexpected columns
+}
+
 export interface SystemHeartbeatStatus {
   systemId: string;
   url: string;
@@ -88,4 +112,4 @@ export interface SystemHeartbeatStatus {
 }
 
 export type ViewLayout = 'grid' | 'compact' | 'table' | 'workflow';
-export type ActiveTab = 'dashboard' | 'systems' | 'whatsapp' | 'departments' | 'dashboards' | 'favorites' | 'recent' | 'analytics' | 'apps_script' | 'settings';
+export type ActiveTab = 'home' | 'dashboard' | 'systems' | 'whatsapp' | 'email_master' | 'all_contacts' | 'departments' | 'dashboards' | 'favorites' | 'recent' | 'analytics' | 'apps_script' | 'settings';

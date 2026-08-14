@@ -151,7 +151,9 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 exit={{ opacity: 0, scale: 0.8 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onResetFilters}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold bg-rose-500/15 text-rose-300 border border-rose-500/40 hover:bg-rose-500/25 transition-colors shadow-xs"
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-colors shadow-xs ${
+                  darkMode ? 'bg-rose-500/15 text-rose-300 border border-rose-500/40 hover:bg-rose-500/25' : 'bg-rose-100 text-rose-700 border border-rose-300 hover:bg-rose-200'
+                }`}
                 title="Reset all filters"
               >
                 <X className="w-3.5 h-3.5" />
@@ -203,11 +205,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
       </div>
 
       {/* Summary Count Bar & Realtime Heartbeat Stream */}
-      <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400 px-1 font-mono">
+      <div className={`flex flex-wrap items-center justify-between gap-2 text-xs px-1 font-mono ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
         <span className="flex items-center gap-1.5">
-          <Terminal className="w-3 h-3 text-cyan-400" />
-          <span>SYS_INDEX:</span> <strong className="text-cyan-300 font-bold">{totalFilteredCount}</strong> of <strong className="text-slate-200">{totalAllCount}</strong> ACTIVE_NODES
-          {selectedDepartment !== 'ALL' && <span className="text-cyan-400">[{selectedDepartment}]</span>}
+          <Terminal className={`w-3 h-3 ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`} />
+          <span>SYS_INDEX:</span> <strong className={`font-bold ${darkMode ? 'text-cyan-300' : 'text-cyan-700'}`}>{totalFilteredCount}</strong> of <strong className={darkMode ? 'text-slate-200' : 'text-slate-800'}>{totalAllCount}</strong> ACTIVE_NODES
+          {selectedDepartment !== 'ALL' && <span className={darkMode ? 'text-cyan-400' : 'text-cyan-600'}>[{selectedDepartment}]</span>}
         </span>
         
         <div className="flex items-center gap-2">
@@ -216,14 +218,16 @@ export const FilterBar: React.FC<FilterBarProps> = ({
               whileTap={{ scale: 0.95 }}
               onClick={onRefreshAllHeartbeats}
               disabled={isPingingAll}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 hover:bg-cyan-500/20 transition-all disabled:opacity-50"
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all disabled:opacity-50 border ${
+                darkMode ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30 hover:bg-cyan-500/20' : 'bg-cyan-100 text-cyan-700 border-cyan-300 hover:bg-cyan-200'
+              }`}
               title="Ping all system URLs via Google Apps Script backend proxy"
             >
               <RotateCw className={`w-2.5 h-2.5 ${isPingingAll ? 'animate-spin' : ''}`} />
               <span>{isPingingAll ? 'PINGING_ALL...' : 'RE-CHECK_HEARTBEATS'}</span>
             </motion.button>
           )}
-          <span className="text-[11px] text-cyan-400 hidden sm:inline-flex items-center gap-1">
+          <span className={`text-[11px] hidden sm:inline-flex items-center gap-1 ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`}>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             APPS_SCRIPT_PROXY_LIVE
           </span>

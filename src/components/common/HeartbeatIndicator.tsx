@@ -48,51 +48,51 @@ export const HeartbeatIndicator: React.FC<HeartbeatIndicatorProps> = ({
   // Color config based on health state
   const config = {
     ONLINE: {
-      dotColor: 'bg-emerald-400',
-      pingColor: 'bg-emerald-400',
-      textColor: 'text-emerald-400',
-      bgColor: 'bg-emerald-500/10 border-emerald-500/30',
-      glowColor: 'shadow-emerald-500/25',
+      dotColor: darkMode ? 'bg-emerald-400' : 'bg-emerald-500',
+      pingColor: darkMode ? 'bg-emerald-400' : 'bg-emerald-500',
+      textColor: darkMode ? 'text-emerald-400' : 'text-emerald-700',
+      bgColor: darkMode ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-100 border-emerald-300',
+      glowColor: darkMode ? 'shadow-emerald-500/25' : 'shadow-emerald-200/50',
       label: 'ONLINE',
       subText: `HTTP ${statusCode} OK • ${latency}ms latency`,
       icon: Activity,
     },
     OFFLINE: {
-      dotColor: 'bg-rose-500',
-      pingColor: 'bg-rose-500',
-      textColor: 'text-rose-400',
-      bgColor: 'bg-rose-500/10 border-rose-500/30',
-      glowColor: 'shadow-rose-500/25',
+      dotColor: darkMode ? 'bg-rose-500' : 'bg-rose-600',
+      pingColor: darkMode ? 'bg-rose-500' : 'bg-rose-600',
+      textColor: darkMode ? 'text-rose-400' : 'text-rose-700',
+      bgColor: darkMode ? 'bg-rose-500/10 border-rose-500/30' : 'bg-rose-100 border-rose-300',
+      glowColor: darkMode ? 'shadow-rose-500/25' : 'shadow-rose-200/50',
       label: 'OFFLINE',
       subText: status?.message || 'Endpoint unreachable by backend proxy',
       icon: WifiOff,
     },
     CHECKING: {
-      dotColor: 'bg-cyan-400',
-      pingColor: 'bg-cyan-400',
-      textColor: 'text-cyan-400',
-      bgColor: 'bg-cyan-500/10 border-cyan-500/30',
-      glowColor: 'shadow-cyan-500/25',
+      dotColor: darkMode ? 'bg-cyan-400' : 'bg-cyan-500',
+      pingColor: darkMode ? 'bg-cyan-400' : 'bg-cyan-500',
+      textColor: darkMode ? 'text-cyan-400' : 'text-cyan-700',
+      bgColor: darkMode ? 'bg-cyan-500/10 border-cyan-500/30' : 'bg-cyan-100 border-cyan-300',
+      glowColor: darkMode ? 'shadow-cyan-500/25' : 'shadow-cyan-200/50',
       label: 'PINGING',
       subText: 'Testing URL reachability via Google Apps Script...',
       icon: RotateCw,
     },
     NO_URL: {
-      dotColor: 'bg-slate-500',
+      dotColor: darkMode ? 'bg-slate-500' : 'bg-slate-400',
       pingColor: 'bg-transparent',
-      textColor: 'text-slate-400',
-      bgColor: 'bg-slate-800/40 border-slate-700/40',
+      textColor: darkMode ? 'text-slate-400' : 'text-slate-600',
+      bgColor: darkMode ? 'bg-slate-800/40 border-slate-700/40' : 'bg-slate-100 border-slate-300',
       glowColor: 'shadow-none',
       label: 'NO URL',
       subText: 'No target software URL defined in Sheet',
       icon: HelpCircle,
     }
   }[currentStatus] || {
-    dotColor: 'bg-emerald-400',
-    pingColor: 'bg-emerald-400',
-    textColor: 'text-emerald-400',
-    bgColor: 'bg-emerald-500/10 border-emerald-500/30',
-    glowColor: 'shadow-emerald-500/25',
+    dotColor: darkMode ? 'bg-emerald-400' : 'bg-emerald-500',
+    pingColor: darkMode ? 'bg-emerald-400' : 'bg-emerald-500',
+    textColor: darkMode ? 'text-emerald-400' : 'text-emerald-700',
+    bgColor: darkMode ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-emerald-100 border-emerald-300',
+    glowColor: darkMode ? 'shadow-emerald-500/25' : 'shadow-emerald-200/50',
     label: 'ONLINE',
     subText: 'System healthy',
     icon: Activity,
@@ -159,8 +159,8 @@ export const HeartbeatIndicator: React.FC<HeartbeatIndicatorProps> = ({
             {/* Cyber Corner HUD tick */}
             <span className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-cyan-400"></span>
             
-            <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800">
-              <div className="flex items-center gap-1.5 font-mono font-bold text-[11px] text-cyan-400">
+            <div className={`flex items-center justify-between pb-1.5 mb-1.5 border-b ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+              <div className={`flex items-center gap-1.5 font-mono font-bold text-[11px] ${darkMode ? 'text-cyan-400' : 'text-cyan-700'}`}>
                 <Wifi className="w-3.5 h-3.5" />
                 <span>SYSTEM_HEARTBEAT</span>
               </div>
@@ -170,27 +170,27 @@ export const HeartbeatIndicator: React.FC<HeartbeatIndicatorProps> = ({
             </div>
 
             <div className="space-y-1 text-[11px] font-mono">
-              <div className="flex items-center justify-between text-slate-300">
-                <span className="text-slate-400">Status:</span>
-                <span className="font-bold text-slate-100">{config.subText}</span>
+              <div className={`flex items-center justify-between ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                <span className={darkMode ? 'text-slate-400' : 'text-slate-500'}>Status:</span>
+                <span className={`font-bold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>{config.subText}</span>
               </div>
-              <div className="flex items-center justify-between text-slate-300">
-                <span className="text-slate-400">Backend Proxy:</span>
-                <span className="text-cyan-300">{checkedVia === 'APPS_SCRIPT' ? 'Google Apps Script' : 'Intranet Probe'}</span>
+              <div className={`flex items-center justify-between ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                <span className={darkMode ? 'text-slate-400' : 'text-slate-500'}>Backend Proxy:</span>
+                <span className={darkMode ? 'text-cyan-300' : 'text-cyan-700'}>{checkedVia === 'APPS_SCRIPT' ? 'Google Apps Script' : 'Intranet Probe'}</span>
               </div>
-              <div className="flex items-center justify-between text-slate-300">
-                <span className="text-slate-400">Endpoint:</span>
-                <span className="truncate max-w-[130px] text-slate-300" title={targetUrl}>{targetUrl}</span>
+              <div className={`flex items-center justify-between ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                <span className={darkMode ? 'text-slate-400' : 'text-slate-500'}>Endpoint:</span>
+                <span className={`truncate max-w-[130px] ${darkMode ? 'text-slate-300' : 'text-slate-600'}`} title={targetUrl}>{targetUrl}</span>
               </div>
               {status?.lastChecked && (
-                <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800/80">
+                <div className={`flex items-center justify-between text-[10px] pt-1 border-t ${darkMode ? 'text-slate-400 border-slate-800/80' : 'text-slate-500 border-slate-200'}`}>
                   <span>Last Ping:</span>
                   <span>{new Date(status.lastChecked).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                 </div>
               )}
             </div>
 
-            <div className="mt-2 pt-1.5 border-t border-slate-800 text-[10px] text-cyan-400/80 font-mono text-center">
+            <div className={`mt-2 pt-1.5 border-t text-[10px] font-mono text-center ${darkMode ? 'border-slate-800 text-cyan-400/80' : 'border-slate-200 text-cyan-700'}`}>
               ⚡ Click pulse badge to re-test connection
             </div>
           </motion.div>

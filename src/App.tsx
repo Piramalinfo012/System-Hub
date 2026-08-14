@@ -13,6 +13,7 @@ import { Header } from './components/common/Header';
 import { Sidebar } from './components/common/Sidebar';
 import { KpiCard } from './components/common/KpiCard';
 import { FilterBar } from './components/dashboard/FilterBar';
+import { LandingHero } from './components/dashboard/LandingHero';
 import { SystemGrid } from './components/dashboard/SystemGrid';
 import { SystemDetailsModal } from './components/systems/SystemDetailsModal';
 import { FavoritesView } from './components/views/FavoritesView';
@@ -20,12 +21,15 @@ import { RecentlyOpenedView } from './components/views/RecentlyOpenedView';
 import { DepartmentView } from './components/views/DepartmentView';
 import { DashboardsCatalogView } from './components/views/DashboardsCatalogView';
 import { WhatsappAutomationView } from './components/views/WhatsappAutomationView';
+import { EmailMasterView } from './components/views/EmailMasterView';
+import { AllContactsView } from './components/views/AllContactsView';
 import { AnalyticsView } from './components/analytics/AnalyticsView';
 import { GoogleSheetStudio } from './components/apps_script/GoogleSheetStudio';
 import { SettingsModal } from './components/settings/SettingsModal';
 import { LoadingSkeleton } from './components/common/LoadingSkeleton';
 import { ErrorState } from './components/common/ErrorState';
 import { EmptyState } from './components/common/EmptyState';
+import { Chatbot } from './components/common/Chatbot';
 import { 
   Layers, 
   Building2, 
@@ -71,7 +75,7 @@ export default function App() {
   });
 
   // Navigation & View
-  const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard');
+  const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [viewLayout, setViewLayout] = useState<ViewLayout>('grid');
   const [isCollapsedSidebar, setIsCollapsedSidebar] = useState<boolean>(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState<boolean>(false);
@@ -161,7 +165,7 @@ export default function App() {
           setHeartbeats(batchResults);
         });
       } else {
-        throw new Error(response.error || 'Failed to load system records from Google Sheet');
+        throw new Error(response.error || 'Failed to load system records from Database');
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -349,6 +353,11 @@ export default function App() {
         {/* Main Content Area */}
         <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
           
+          {/* Active Tab: HOME (Landing Page) */}
+          {activeTab === 'home' && (
+            <LandingHero />
+          )}
+
           {/* Active Tab: COMMAND CENTER / DASHBOARD & ALL SYSTEMS */}
           {(activeTab === 'dashboard' || activeTab === 'systems') && (
             <div className="space-y-6 animate-in fade-in duration-200">
@@ -367,7 +376,7 @@ export default function App() {
                     <div className="space-y-2 max-w-2xl">
                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
                         <Sparkles className="w-3.5 h-3.5" />
-                        <span>Connected to Master Google Sheet Database</span>
+                        <span>Connected to Central Master Database</span>
                       </div>
                       <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                         Welcome to Digital System Hub
@@ -522,6 +531,20 @@ export default function App() {
             />
           )}
 
+          {/* Active Tab: EMAIL MASTER */}
+          {activeTab === 'email_master' && (
+            <EmailMasterView
+              darkMode={darkMode}
+            />
+          )}
+
+          {/* Active Tab: ALL CONTACTS */}
+          {activeTab === 'all_contacts' && (
+            <AllContactsView
+              darkMode={darkMode}
+            />
+          )}
+
           {/* Active Tab: DEPARTMENTS VIEW */}
           {activeTab === 'departments' && (
             <DepartmentView
@@ -593,7 +616,7 @@ export default function App() {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold">Portal Configuration</h2>
-                  <p className="text-xs text-slate-400">Manage Google Sheet integration and portal settings</p>
+                  <p className="text-xs text-slate-400">Manage backend integration and portal settings</p>
                 </div>
               </div>
 
@@ -603,8 +626,8 @@ export default function App() {
                   className="w-full p-4 rounded-2xl bg-slate-950 border border-slate-800 hover:border-cyan-500/40 text-left flex items-center justify-between transition-colors"
                 >
                   <div>
-                    <h4 className="text-sm font-bold">Configure Google Apps Script API URL</h4>
-                    <p className="text-xs text-slate-400 mt-0.5">Switch between Live Google Sheet and Simulator</p>
+                    <h4 className="text-sm font-bold">Configure Backend API URL</h4>
+                    <p className="text-xs text-slate-400 mt-0.5">Switch between Live Database and Simulator</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-cyan-400" />
                 </button>
@@ -645,6 +668,9 @@ export default function App() {
         darkMode={darkMode}
         onRefreshData={() => loadData(true)}
       />
+
+      {/* 5. GLOBAL CHATBOT */}
+      <Chatbot darkMode={darkMode} systems={systems} />
 
     </div>
   );

@@ -72,7 +72,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
           darkMode ? 'bg-slate-900/50 border-slate-800' : 'bg-white border-slate-200'
         }`}>
           <Star className="w-10 h-10 mx-auto text-slate-600 mb-3" />
-          <h3 className="text-base font-bold">No favorite systems yet</h3>
+          <h3 className={`text-base font-bold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>No favorite systems yet</h3>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
             Click the star icon on any system card across the portal to bookmark it for instant one-click access.
           </p>
