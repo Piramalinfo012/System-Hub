@@ -1,0 +1,6 @@
+{
+  "name": "Company Digital System Hub",
+  "description": "Enterprise digital system index portal and command center connected to Google Sheets as the single source of truth.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
