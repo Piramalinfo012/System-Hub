@@ -1,6 +1,6 @@
 import React from 'react';
 import { Star, Sparkles, Layers, SearchX } from 'lucide-react';
-import { SystemItem } from '../../types';
+import { SystemItem, SystemHeartbeatStatus } from '../../types';
 import { SystemCard } from '../systems/SystemCard';
 
 interface FavoritesViewProps {
@@ -10,6 +10,8 @@ interface FavoritesViewProps {
   onViewDetails: (system: SystemItem) => void;
   darkMode: boolean;
   onExploreAll: () => void;
+  heartbeats?: Record<string, SystemHeartbeatStatus>;
+  onRefreshHeartbeat?: (system: SystemItem) => Promise<void> | void;
 }
 
 export const FavoritesView: React.FC<FavoritesViewProps> = ({
@@ -19,6 +21,8 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
   onViewDetails,
   darkMode,
   onExploreAll,
+  heartbeats = {},
+  onRefreshHeartbeat,
 }) => {
   const favoriteSystems = systems.filter(sys => favoriteIds.includes(sys.id));
 
@@ -58,6 +62,8 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
               onToggleFavorite={onToggleFavorite}
               onViewDetails={onViewDetails}
               darkMode={darkMode}
+              heartbeatStatus={heartbeats[system.id]}
+              onRefreshHeartbeat={onRefreshHeartbeat}
             />
           ))}
         </div>

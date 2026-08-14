@@ -15,6 +15,56 @@ function getSpreadsheet() {
 }
 
 function doGet(e) {
+    const action = (e && e.parameter && e.parameter.action) ? e.parameter.action : "read";
+
+    // ============== HEARTBEAT / REACHABILITY PING ENDPOINT ==============
+    if (action === "ping" || action === "healthCheck") {
+        const targetUrl = (e && e.parameter && e.parameter.url) ? decodeURIComponent(e.parameter.url) : "";
+        if (!targetUrl) {
+            return jsonError("URL parameter is required for heartbeat ping");
+        }
+
+        const startTime = new Date().getTime();
+        try {
+            const response = UrlFetchApp.fetch(targetUrl, {
+                muteHttpExceptions: true,
+                followRedirects: true,
+                validateHttpsCertificates: false
+            });
+            const endTime = new Date().getTime();
+            const statusCode = response.getResponseCode();
+            const isReachable = statusCode >= 200 && statusCode < 400;
+
+            const pingResult = {
+                success: true,
+                action: "ping",
+                url: targetUrl,
+                reachable: isReachable,
+                statusCode: statusCode,
+                responseTimeMs: (endTime - startTime),
+                timestamp: new Date().toISOString()
+            };
+
+            return ContentService.createTextOutput(JSON.stringify(pingResult))
+                .setMimeType(ContentService.MimeType.JSON);
+        } catch (err) {
+            const endTime = new Date().getTime();
+            const pingResult = {
+                success: true,
+                action: "ping",
+                url: targetUrl,
+                reachable: false,
+                statusCode: 0,
+                responseTimeMs: (endTime - startTime),
+                error: err.toString(),
+                timestamp: new Date().toISOString()
+            };
+
+            return ContentService.createTextOutput(JSON.stringify(pingResult))
+                .setMimeType(ContentService.MimeType.JSON);
+        }
+    }
+
     const sheetName = (e && e.parameter && e.parameter.sheet) ? e.parameter.sheet : "Data";
 
     try {

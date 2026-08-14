@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart3, FileSpreadsheet, ExternalLink, Sparkles, SearchX } from 'lucide-react';
+import { motion } from 'motion/react';
 import { SystemItem } from '../../types';
 import { GoogleSheetService } from '../../services/googleSheetService';
 
@@ -19,9 +20,10 @@ export const DashboardsCatalogView: React.FC<DashboardsCatalogViewProps> = ({
     <div className="space-y-6">
       
       {/* Header */}
-      <div className={`p-6 rounded-3xl border ${
-        darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'
+      <div className={`p-6 rounded-3xl border relative overflow-hidden ${
+        darkMode ? 'bg-slate-900/80 border-slate-800 backdrop-blur-md' : 'bg-white border-slate-200'
       }`}>
+        <span className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-amber-400"></span>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
@@ -42,74 +44,80 @@ export const DashboardsCatalogView: React.FC<DashboardsCatalogViewProps> = ({
 
       {/* SECTION 1: BI DASHBOARDS */}
       <div>
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2 font-mono">
           <BarChart3 className="w-4 h-4 text-amber-400" />
           Connected Operational Dashboards ({systemsWithDashboard.length})
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {systemsWithDashboard.map((sys) => (
-            <div
+            <motion.div
               key={sys.id}
+              whileHover={{ y: -5, scale: 1.015 }}
+              transition={{ type: "spring", stiffness: 350, damping: 20 }}
               onClick={() => GoogleSheetService.openExternalUrl(sys.dashboardUrl, `${sys.systemName} (Dashboard)`, sys.id, 'dashboard', sys.department)}
-              className={`p-5 rounded-2xl border transition-all hover:-translate-y-0.5 cursor-pointer flex flex-col justify-between ${
+              className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden group ${
                 darkMode
-                  ? 'bg-slate-900/80 border-slate-800 hover:border-amber-500/50 hover:bg-slate-850 shadow-md'
+                  ? 'bg-slate-900/80 border-slate-800 hover:border-amber-500/50 hover:bg-slate-900 shadow-md hover:shadow-amber-500/10'
                   : 'bg-white border-slate-200 hover:border-amber-400 shadow-xs'
               }`}
             >
+              <span className="absolute top-0 left-0 w-2.5 h-2.5 border-t-2 border-l-2 border-amber-400/60 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">
                     {sys.department}
                   </span>
-                  <ExternalLink className="w-4 h-4 text-amber-400" />
+                  <ExternalLink className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-100 dark:text-slate-100">{sys.systemName}</h4>
+                <h4 className="text-sm font-bold text-slate-100 group-hover:text-amber-300 transition-colors line-clamp-1">{sys.systemName}</h4>
                 <p className="text-xs text-slate-400 mt-1 line-clamp-2">{sys.description}</p>
               </div>
 
               <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
                 <span className="text-slate-500 font-mono">BI Report</span>
-                <span className="text-amber-400 font-semibold">Launch Dashboard ↗</span>
+                <span className="text-amber-400 font-semibold flex items-center gap-1">Launch Dashboard ↗</span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
 
       {/* SECTION 2: GOOGLE SHEETS */}
       <div className="pt-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2">
+        <h3 className="text-sm font-bold uppercase tracking-wider text-slate-300 mb-3 flex items-center gap-2 font-mono">
           <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
           Master Google Sheets & Ledgers ({systemsWithSheet.length})
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {systemsWithSheet.map((sys) => (
-            <div
+            <motion.div
               key={sys.id}
+              whileHover={{ y: -5, scale: 1.015 }}
+              transition={{ type: "spring", stiffness: 350, damping: 20 }}
               onClick={() => GoogleSheetService.openExternalUrl(sys.sheetUrl, `${sys.systemName} (Sheet)`, sys.id, 'sheet', sys.department)}
-              className={`p-5 rounded-2xl border transition-all hover:-translate-y-0.5 cursor-pointer flex flex-col justify-between ${
+              className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between relative overflow-hidden group ${
                 darkMode
-                  ? 'bg-slate-900/80 border-slate-800 hover:border-emerald-500/50 hover:bg-slate-850 shadow-md'
+                  ? 'bg-slate-900/80 border-slate-800 hover:border-emerald-500/50 hover:bg-slate-900 shadow-md hover:shadow-emerald-500/10'
                   : 'bg-white border-slate-200 hover:border-emerald-400 shadow-xs'
               }`}
             >
+              <span className="absolute top-0 left-0 w-2.5 h-2.5 border-t-2 border-l-2 border-emerald-400/60 opacity-0 group-hover:opacity-100 transition-opacity"></span>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                     {sys.department}
                   </span>
-                  <ExternalLink className="w-4 h-4 text-emerald-400" />
+                  <ExternalLink className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
                 </div>
-                <h4 className="text-sm font-bold text-slate-100 dark:text-slate-100">{sys.systemName}</h4>
+                <h4 className="text-sm font-bold text-slate-100 group-hover:text-emerald-300 transition-colors line-clamp-1">{sys.systemName}</h4>
                 <p className="text-xs text-slate-400 mt-1 line-clamp-2">Database & Ledger Sheet</p>
               </div>
 
               <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs">
                 <span className="text-slate-500 font-mono">Google Sheet</span>
-                <span className="text-emerald-400 font-semibold">Open Spreadsheet ↗</span>
+                <span className="text-emerald-400 font-semibold flex items-center gap-1">Open Spreadsheet ↗</span>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

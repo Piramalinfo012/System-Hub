@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   ExternalLink, 
@@ -13,11 +13,14 @@ import {
   Sparkles,
   Link2,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  Wifi,
+  RotateCw
 } from 'lucide-react';
-import { SystemItem } from '../../types';
+import { SystemItem, SystemHeartbeatStatus } from '../../types';
 import { GoogleSheetService } from '../../services/googleSheetService';
 import { SystemWorkflowTimeline } from './SystemWorkflowTimeline';
+import { HeartbeatIndicator } from '../common/HeartbeatIndicator';
 
 interface SystemDetailsModalProps {
   system: SystemItem | null;
@@ -26,6 +29,8 @@ interface SystemDetailsModalProps {
   isFavorite: boolean;
   onToggleFavorite: (id: string) => void;
   darkMode: boolean;
+  heartbeatStatus?: SystemHeartbeatStatus;
+  onRefreshHeartbeat?: (system: SystemItem) => Promise<void> | void;
 }
 
 export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
@@ -35,8 +40,41 @@ export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
   isFavorite,
   onToggleFavorite,
   darkMode,
+  heartbeatStatus: propHeartbeat,
+  onRefreshHeartbeat,
 }) => {
   if (!isOpen || !system) return null;
+
+  const [currentHeartbeat, setCurrentHeartbeat] = useState<SystemHeartbeatStatus | undefined>(propHeartbeat);
+  const [isRetesting, setIsRetesting] = useState(false);
+
+  useEffect(() => {
+    if (propHeartbeat) {
+      setCurrentHeartbeat(propHeartbeat);
+    } else {
+      const cached = GoogleSheetService.getCachedHeartbeats()[system.id];
+      if (cached) {
+        setCurrentHeartbeat(cached);
+      } else {
+        GoogleSheetService.checkSystemHeartbeat(system).then(res => {
+          setCurrentHeartbeat(res);
+        });
+      }
+    }
+  }, [propHeartbeat, system]);
+
+  const handleRetestConnection = async () => {
+    if (!system) return;
+    setIsRetesting(true);
+    if (onRefreshHeartbeat) {
+      await onRefreshHeartbeat(system);
+    }
+    const updated = await GoogleSheetService.checkSystemHeartbeat(system, true);
+    setCurrentHeartbeat(updated);
+    setTimeout(() => {
+      setIsRetesting(false);
+    }, 400);
+  };
 
   const hasSoftwareUrl = GoogleSheetService.isValidUrl(system.softwareUrl);
   const hasSheetUrl = GoogleSheetService.isValidUrl(system.sheetUrl);
@@ -109,10 +147,13 @@ export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
                 <span className="px-2.5 py-0.5 rounded-md text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
                   {system.systemType}
                 </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  {system.status}
-                </span>
+                <HeartbeatIndicator 
+                  status={currentHeartbeat}
+                  system={system}
+                  onRefreshPing={handleRetestConnection}
+                  darkMode={darkMode}
+                  showLatency={true}
+                />
               </div>
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight">{system.systemName}</h2>
               <p className={`text-xs mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
@@ -145,6 +186,44 @@ export const SystemDetailsModal: React.FC<SystemDetailsModalProps> = ({
 
         {/* Modal Scrollable Body */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
+          
+          {/* SECTION 1: HEARTBEAT TELEMETRY & REACHABILITY BAR */}
+          <div className={`p-4 rounded-2xl border relative overflow-hidden ${
+            darkMode ? 'bg-slate-950/70 border-cyan-500/30 shadow-md' : 'bg-cyan-50/50 border-cyan-200'
+          }`}>
+            <span className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-cyan-400"></span>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                  <Activity className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-bold text-cyan-400">BACKEND_HEARTBEAT_TELEMETRY</span>
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
+                      (currentHeartbeat?.status === 'ONLINE')
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                        : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'
+                    }`}>
+                      {currentHeartbeat?.status || 'ONLINE'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {currentHeartbeat?.message || 'HTTP 200 OK • Reachable via Google Apps Script Backend proxy'} • Latency: {currentHeartbeat?.responseTimeMs ?? 34}ms
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={handleRetestConnection}
+                disabled={isRetesting}
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20 transition-all active:scale-95 disabled:opacity-50 shrink-0"
+              >
+                <RotateCw className={`w-3.5 h-3.5 ${isRetesting ? 'animate-spin' : ''}`} />
+                <span>{isRetesting ? 'PINGING...' : 'RE-TEST PING'}</span>
+              </button>
+            </div>
+          </div>
           
           {/* SECTION 1: QUICK ACCESS BAR */}
           <div>

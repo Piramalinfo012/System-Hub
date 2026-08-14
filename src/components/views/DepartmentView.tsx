@@ -1,5 +1,6 @@
 import React from 'react';
 import { Building2, Layers, ArrowRight, ExternalLink } from 'lucide-react';
+import { motion } from 'motion/react';
 import { SystemItem } from '../../types';
 
 interface DepartmentViewProps {
@@ -81,30 +82,36 @@ export const DepartmentView: React.FC<DepartmentViewProps> = ({
               {/* Department System Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {deptSystems.map((system) => (
-                  <div
+                  <motion.div
                     key={system.id}
+                    whileHover={{ y: -4, scale: 1.015 }}
+                    transition={{ type: "spring", stiffness: 350, damping: 20 }}
                     onClick={() => onViewDetails(system)}
-                    className={`p-4 rounded-2xl border transition-all hover:-translate-y-0.5 cursor-pointer ${
+                    className={`p-4 rounded-2xl border transition-all cursor-pointer relative overflow-hidden group ${
                       darkMode
-                        ? 'bg-slate-950/60 border-slate-800 hover:border-cyan-500/40 hover:bg-slate-850'
-                        : 'bg-slate-50 border-slate-200 hover:border-blue-400'
+                        ? 'bg-slate-950/60 border-slate-800 hover:border-cyan-500/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-500/10'
+                        : 'bg-slate-50 border-slate-200 hover:border-cyan-400 hover:shadow-md'
                     }`}
                   >
+                    <span className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-cyan-400/60 opacity-0 group-hover:opacity-100 transition-opacity"></span>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
                         {system.systemType}
                       </span>
                       <span className="text-xs font-mono text-cyan-400 font-bold">
                         {system.steps.length} Steps
                       </span>
                     </div>
-                    <h4 className="text-sm font-bold truncate text-slate-100 dark:text-slate-100">
+
+                    <h4 className="text-sm font-bold text-slate-100 group-hover:text-cyan-300 transition-colors line-clamp-1">
                       {system.systemName}
                     </h4>
-                    <p className="text-xs text-slate-400 line-clamp-2 mt-1">
-                      {system.description}
-                    </p>
-                  </div>
+                    {system.doer && (
+                      <p className="text-xs text-slate-400 mt-1 truncate">
+                        👤 {system.doer}
+                      </p>
+                    )}
+                  </motion.div>
                 ))}
               </div>
             </div>

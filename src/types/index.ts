@@ -76,5 +76,16 @@ export interface WhatsappAutomationItem {
   triggersCount?: number;
 }
 
+export interface SystemHeartbeatStatus {
+  systemId: string;
+  url: string;
+  status: 'ONLINE' | 'OFFLINE' | 'CHECKING' | 'NO_URL';
+  statusCode?: number;
+  responseTimeMs?: number;
+  lastChecked: number;
+  message?: string;
+  checkedVia?: 'APPS_SCRIPT' | 'SIMULATOR_PING' | 'DIRECT';
+}
+
 export type ViewLayout = 'grid' | 'compact' | 'table' | 'workflow';
 export type ActiveTab = 'dashboard' | 'systems' | 'whatsapp' | 'departments' | 'dashboards' | 'favorites' | 'recent' | 'analytics' | 'apps_script' | 'settings';

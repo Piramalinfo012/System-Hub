@@ -4,7 +4,8 @@ import {
   SystemItem, 
   ActiveTab, 
   ViewLayout, 
-  GoogleSheetApiResponse 
+  GoogleSheetApiResponse,
+  SystemHeartbeatStatus
 } from './types';
 import { GoogleSheetService } from './services/googleSheetService';
 import { Login } from './components/auth/Login';
@@ -97,6 +98,31 @@ export default function App() {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [recentCount, setRecentCount] = useState<number>(0);
 
+  // System Heartbeats (URL Reachability via Apps Script Backend)
+  const [heartbeats, setHeartbeats] = useState<Record<string, SystemHeartbeatStatus>>(() => GoogleSheetService.getCachedHeartbeats());
+  const [isPingingAllHeartbeats, setIsPingingAllHeartbeats] = useState<boolean>(false);
+
+  // Refresh single heartbeat
+  const handleRefreshSystemHeartbeat = useCallback(async (sys: SystemItem) => {
+    const result = await GoogleSheetService.checkSystemHeartbeat(sys, true);
+    setHeartbeats(prev => ({
+      ...prev,
+      [sys.id]: result
+    }));
+  }, []);
+
+  // Refresh all heartbeats in batch
+  const handleRefreshAllHeartbeats = useCallback(async () => {
+    if (systems.length === 0) return;
+    setIsPingingAllHeartbeats(true);
+    try {
+      const results = await GoogleSheetService.batchCheckHeartbeats(systems);
+      setHeartbeats(results);
+    } finally {
+      setIsPingingAllHeartbeats(false);
+    }
+  }, [systems]);
+
   // Synchronize Dark Mode Class on Root
   useEffect(() => {
     if (darkMode) {
@@ -130,6 +156,10 @@ export default function App() {
       if (response.success && Array.isArray(response.data)) {
         setSystems(response.data);
         setApiResponseMeta(response.metadata || null);
+        // Trigger background heartbeat health checks
+        GoogleSheetService.batchCheckHeartbeats(response.data).then(batchResults => {
+          setHeartbeats(batchResults);
+        });
       } else {
         throw new Error(response.error || 'Failed to load system records from Google Sheet');
       }
@@ -147,6 +177,18 @@ export default function App() {
   useEffect(() => {
     loadData(false);
   }, [loadData]);
+
+  // Periodic heartbeat background pulse check (every 60s)
+  useEffect(() => {
+    if (systems.length === 0) return;
+    const pulseTimer = setInterval(() => {
+      GoogleSheetService.batchCheckHeartbeats(systems).then(batchResults => {
+        setHeartbeats(batchResults);
+      });
+    }, 60000);
+
+    return () => clearInterval(pulseTimer);
+  }, [systems]);
 
   // Auto-refresh timer loop (from settings e.g. 5m)
   useEffect(() => {
@@ -261,7 +303,7 @@ export default function App() {
 
   return (
     <div className={`min-h-screen transition-colors duration-200 ${
-      darkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+      darkMode ? 'bg-slate-950 text-slate-100 cyber-grid-dark' : 'bg-slate-50 text-slate-900 cyber-grid-light'
     }`}>
       
       {/* 1. TOP HEADER */}
@@ -433,6 +475,8 @@ export default function App() {
                   setSearchQuery('');
                   setSortBy('default');
                 }}
+                onRefreshAllHeartbeats={handleRefreshAllHeartbeats}
+                isPingingAll={isPingingAllHeartbeats}
               />
 
               {/* Main System Grid / Loading / Error / Empty States */}
@@ -458,6 +502,8 @@ export default function App() {
                   onViewDetails={(system) => setSelectedSystemModal(system)}
                   viewLayout={viewLayout}
                   darkMode={darkMode}
+                  heartbeats={heartbeats}
+                  onRefreshHeartbeat={handleRefreshSystemHeartbeat}
                   onClearFilters={() => {
                     setSelectedDepartment('ALL');
                     setSelectedSystemType('ALL');
@@ -505,6 +551,8 @@ export default function App() {
               onToggleFavorite={handleToggleFavorite}
               onViewDetails={(system) => setSelectedSystemModal(system)}
               darkMode={darkMode}
+              heartbeats={heartbeats}
+              onRefreshHeartbeat={handleRefreshSystemHeartbeat}
               onExploreAll={() => setActiveTab('systems')}
             />
           )}
@@ -586,6 +634,8 @@ export default function App() {
         isFavorite={Boolean(selectedSystemModal && favoriteIds.includes(selectedSystemModal.id))}
         onToggleFavorite={handleToggleFavorite}
         darkMode={darkMode}
+        heartbeatStatus={selectedSystemModal ? heartbeats[selectedSystemModal.id] : undefined}
+        onRefreshHeartbeat={handleRefreshSystemHeartbeat}
       />
 
       {/* 4. SETTINGS MODAL */}

@@ -1,20 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  ExternalLink, 
-  FileSpreadsheet, 
-  BarChart3, 
   Star, 
   ArrowRight, 
   Monitor, 
   Layers, 
-  User, 
-  Workflow,
-  Sparkles,
-  Lock,
-  Building
+  FileSpreadsheet, 
+  BarChart3,
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
-import { SystemItem } from '../../types';
+import { motion } from 'motion/react';
+import { SystemItem, SystemHeartbeatStatus } from '../../types';
 import { GoogleSheetService } from '../../services/googleSheetService';
+import { HeartbeatIndicator } from '../common/HeartbeatIndicator';
 
 interface SystemCardProps {
   system: SystemItem;
@@ -22,6 +20,8 @@ interface SystemCardProps {
   onToggleFavorite: (id: string) => void;
   onViewDetails: (system: SystemItem) => void;
   darkMode: boolean;
+  heartbeatStatus?: SystemHeartbeatStatus;
+  onRefreshHeartbeat?: (system: SystemItem) => Promise<void> | void;
 }
 
 export const SystemCard: React.FC<SystemCardProps> = ({
@@ -30,61 +30,46 @@ export const SystemCard: React.FC<SystemCardProps> = ({
   onToggleFavorite,
   onViewDetails,
   darkMode,
+  heartbeatStatus: propHeartbeat,
+  onRefreshHeartbeat,
 }) => {
-  const hasSoftwareUrl = GoogleSheetService.isValidUrl(system.softwareUrl);
-  const hasSheetUrl = GoogleSheetService.isValidUrl(system.sheetUrl);
-  const hasDashboardUrl = GoogleSheetService.isValidUrl(system.dashboardUrl);
+  const [localHeartbeat, setLocalHeartbeat] = useState<SystemHeartbeatStatus | undefined>(propHeartbeat);
 
-  const handleOpenSoftware = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (hasSoftwareUrl) {
-      GoogleSheetService.openExternalUrl(
-        system.softwareUrl,
-        system.systemName,
-        system.id,
-        'system',
-        system.department
-      );
+  useEffect(() => {
+    if (propHeartbeat) {
+      setLocalHeartbeat(propHeartbeat);
+    } else {
+      const cached = GoogleSheetService.getCachedHeartbeats()[system.id];
+      if (cached) {
+        setLocalHeartbeat(cached);
+      } else {
+        GoogleSheetService.checkSystemHeartbeat(system).then(res => {
+          setLocalHeartbeat(res);
+        });
+      }
     }
-  };
+  }, [propHeartbeat, system]);
 
-  const handleOpenSheet = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (hasSheetUrl) {
-      GoogleSheetService.openExternalUrl(
-        system.sheetUrl,
-        `${system.systemName} (Google Sheet)`,
-        system.id,
-        'sheet',
-        system.department
-      );
-    }
-  };
-
-  const handleOpenDashboard = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (hasDashboardUrl) {
-      GoogleSheetService.openExternalUrl(
-        system.dashboardUrl,
-        `${system.systemName} (Dashboard)`,
-        system.id,
-        'dashboard',
-        system.department
-      );
+  const handleRefreshPulse = async (sys: SystemItem) => {
+    if (onRefreshHeartbeat) {
+      await onRefreshHeartbeat(sys);
+    } else {
+      const updated = await GoogleSheetService.checkSystemHeartbeat(sys, true);
+      setLocalHeartbeat(updated);
     }
   };
 
   // Department Badge Colors
   const getDeptColor = (dept: string) => {
     const d = dept.toUpperCase();
-    if (d.includes('CRM') || d.includes('SALES')) return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30';
-    if (d.includes('HR')) return 'bg-pink-500/10 text-pink-400 border-pink-500/30';
-    if (d.includes('PURCHASE') || d.includes('PROCURE')) return 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30';
-    if (d.includes('STORE') || d.includes('INVENTORY')) return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-    if (d.includes('TRANSPORT') || d.includes('FLEET')) return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-    if (d.includes('ADMIN') || d.includes('FINANCE')) return 'bg-purple-500/10 text-purple-400 border-purple-500/30';
-    if (d.includes('SECURITY')) return 'bg-rose-500/10 text-rose-400 border-rose-500/30';
-    return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
+    if (d.includes('CRM') || d.includes('SALES')) return 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40 shadow-xs shadow-cyan-500/10';
+    if (d.includes('HR')) return 'bg-pink-500/15 text-pink-300 border-pink-500/40 shadow-xs shadow-pink-500/10';
+    if (d.includes('PURCHASE') || d.includes('PROCURE')) return 'bg-indigo-500/15 text-indigo-300 border-indigo-500/40 shadow-xs shadow-indigo-500/10';
+    if (d.includes('STORE') || d.includes('INVENTORY')) return 'bg-amber-500/15 text-amber-300 border-amber-500/40 shadow-xs shadow-amber-500/10';
+    if (d.includes('TRANSPORT') || d.includes('FLEET')) return 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-xs shadow-emerald-500/10';
+    if (d.includes('ADMIN') || d.includes('FINANCE')) return 'bg-purple-500/15 text-purple-300 border-purple-500/40 shadow-xs shadow-purple-500/10';
+    if (d.includes('SECURITY')) return 'bg-rose-500/15 text-rose-300 border-rose-500/40 shadow-xs shadow-rose-500/10';
+    return 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40 shadow-xs';
   };
 
   // System Type Icon
@@ -96,46 +81,65 @@ export const SystemCard: React.FC<SystemCardProps> = ({
   };
 
   return (
-    <div
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      whileHover={{ y: -6, scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 350, damping: 20 }}
       id={`system-card-${system.id}`}
       onClick={() => onViewDetails(system)}
-      className={`group relative rounded-2xl border transition-all duration-200 flex flex-col justify-between overflow-hidden cursor-pointer ${
+      className={`group relative rounded-2xl border transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer ${
         darkMode
-          ? 'bg-slate-900/80 border-slate-800/90 hover:border-cyan-500/40 hover:bg-slate-850 hover:shadow-xl hover:shadow-cyan-500/5'
-          : 'bg-white border-slate-200 hover:border-blue-400 hover:shadow-md'
+          ? 'bg-slate-900/90 backdrop-blur-md border-slate-800/90 hover:border-cyan-500/70 hover:bg-slate-850 hover:shadow-2xl hover:shadow-cyan-500/20'
+          : 'bg-white border-slate-200 hover:border-cyan-400 hover:shadow-xl'
       }`}
     >
-      {/* Top Header Row */}
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3 mb-3">
+      {/* Ambient background glow matching Cyber theme */}
+      <div className="absolute top-0 right-0 w-36 h-36 rounded-full bg-cyan-500/5 blur-2xl pointer-events-none group-hover:bg-cyan-500/15 transition-all duration-500"></div>
+
+      {/* Cyber Corner HUD Brackets */}
+      <span className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-cyan-400/70 rounded-tl-sm opacity-60 group-hover:opacity-100 group-hover:border-cyan-300 transition-all"></span>
+      <span className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-cyan-400/70 rounded-br-sm opacity-60 group-hover:opacity-100 group-hover:border-cyan-300 transition-all"></span>
+
+      {/* Cyber Top Scanline Glow on Hover */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-linear-to-r from-transparent via-cyan-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+      {/* Main Card Content */}
+      <div className="p-6 relative z-10 flex flex-col justify-between flex-1">
+        
+        {/* Top Header Row: Type Icon, Dept Badge & Favorite Button */}
+        <div className="flex items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2.5">
-            <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shadow-xs ${
-              darkMode ? 'bg-slate-800/80 border-slate-700/60' : 'bg-slate-100 border-slate-200'
+            <div className={`w-9 h-9 rounded-xl flex items-center justify-center border shadow-xs transition-transform group-hover:scale-110 ${
+              darkMode ? 'bg-slate-950/90 border-cyan-500/30' : 'bg-slate-100 border-slate-200'
             }`}>
               {getTypeIcon(system.systemType)}
             </div>
-            <div>
-              <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border uppercase tracking-wider ${getDeptColor(system.department)}`}>
+            <div className="flex items-center gap-1.5">
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border uppercase tracking-wider ${getDeptColor(system.department)}`}>
                 {system.department}
               </span>
-              <span className={`ml-1.5 text-[10px] font-mono ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                {system.systemType}
+              <span className={`text-[10px] font-mono font-semibold ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                #{system.sr}
               </span>
             </div>
           </div>
 
-          {/* Favorite Button */}
+          {/* Favorite Star Button */}
           <button
             id={`fav-btn-${system.id}`}
             onClick={(e) => {
               e.stopPropagation();
               onToggleFavorite(system.id);
             }}
-            className={`p-1.5 rounded-lg border transition-all ${
+            className={`p-2 rounded-xl border transition-all ${
               isFavorite
-                ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-400'
+                ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-400 shadow-xs shadow-yellow-500/20'
                 : darkMode
-                ? 'bg-slate-800/40 border-slate-700/40 text-slate-500 hover:text-slate-300'
+                ? 'bg-slate-950/60 border-slate-800 text-slate-500 hover:text-slate-200 hover:border-slate-700'
                 : 'bg-slate-100 border-slate-200 text-slate-400 hover:text-slate-600'
             }`}
             title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
@@ -144,136 +148,41 @@ export const SystemCard: React.FC<SystemCardProps> = ({
           </button>
         </div>
 
-        {/* System Title */}
-        <h3 className={`text-base font-bold tracking-tight line-clamp-1 group-hover:text-cyan-400 transition-colors ${
-          darkMode ? 'text-slate-100' : 'text-slate-900'
-        }`}>
-          {system.systemName}
-        </h3>
-
-        {/* Doer / Person in charge */}
-        {system.doer && (
-          <div className="flex items-center gap-1.5 mt-1.5 text-xs text-slate-400">
-            <User className="w-3.5 h-3.5 text-slate-500" />
-            <span className="truncate">{system.doer}</span>
-          </div>
-        )}
-
-        {/* Description or excerpt */}
-        <p className={`text-xs mt-2.5 line-clamp-2 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-          {system.description}
-        </p>
-
-        {/* Steps Preview Pill Bar */}
-        <div className="mt-4 pt-3 border-t border-slate-800/60">
-          <div className="flex items-center justify-between text-xs mb-2">
-            <div className="flex items-center gap-1.5 font-medium text-slate-400">
-              <Workflow className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Workflow Steps</span>
-            </div>
-            <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-              {system.steps.length} Steps
-            </span>
-          </div>
-
-          {/* First few step badges */}
-          <div className="flex flex-wrap gap-1.5">
-            {system.steps.slice(0, 3).map((st, idx) => (
-              <span
-                key={idx}
-                className={`text-[10px] font-medium px-2 py-0.5 rounded-md truncate max-w-[130px] border ${
-                  darkMode ? 'bg-slate-800/70 border-slate-700/50 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
-                }`}
-                title={st.name}
-              >
-                {st.header}: {st.name}
-              </span>
-            ))}
-            {system.steps.length > 3 && (
-              <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-md ${darkMode ? 'text-cyan-400 bg-cyan-500/10' : 'text-blue-600 bg-blue-50'}`}>
-                +{system.steps.length - 3} more
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Action Footer Toolbar */}
-      <div className={`px-4 py-3 border-t flex flex-wrap items-center justify-between gap-2 ${
-        darkMode ? 'bg-slate-950/60 border-slate-800/80' : 'bg-slate-50 border-slate-200'
-      }`}>
-        <div className="flex items-center gap-1.5">
-          {/* Main Software Launch Button */}
-          <button
-            id={`open-system-btn-${system.id}`}
-            onClick={handleOpenSoftware}
-            disabled={!hasSoftwareUrl}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shadow-xs ${
-              hasSoftwareUrl
-                ? 'bg-linear-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white hover:shadow-cyan-500/25 active:scale-95'
-                : 'bg-slate-800/60 text-slate-500 border border-slate-700/50 cursor-not-allowed'
-            }`}
-            title={hasSoftwareUrl ? 'Open Software in new tab' : 'Software URL Not Available in Google Sheet'}
-          >
-            <span>OPEN SYSTEM</span>
-            <ExternalLink className="w-3 h-3" />
-          </button>
-
-          {/* Sheet Button */}
-          {hasSheetUrl ? (
-            <button
-              onClick={handleOpenSheet}
-              className={`p-1.5 rounded-xl border transition-colors ${
-                darkMode ? 'bg-slate-900 border-slate-800 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/30' : 'bg-white border-slate-300 text-emerald-600 hover:bg-emerald-50'
-              }`}
-              title="Open Google Sheet"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-            </button>
-          ) : (
-            <span
-              className="p-1.5 rounded-xl border border-transparent text-slate-600 opacity-40 cursor-not-allowed"
-              title="Sheet Not Available"
-            >
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-            </span>
-          )}
-
-          {/* Dashboard Button */}
-          {hasDashboardUrl ? (
-            <button
-              onClick={handleOpenDashboard}
-              className={`p-1.5 rounded-xl border transition-colors ${
-                darkMode ? 'bg-slate-900 border-slate-800 text-amber-400 hover:bg-amber-500/10 hover:border-amber-500/30' : 'bg-white border-slate-300 text-amber-600 hover:bg-amber-50'
-              }`}
-              title="Open BI Dashboard"
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-            </button>
-          ) : (
-            <span
-              className="p-1.5 rounded-xl border border-transparent text-slate-600 opacity-40 cursor-not-allowed"
-              title="Dashboard Not Available"
-            >
-              <BarChart3 className="w-3.5 h-3.5" />
-            </span>
-          )}
+        {/* Hero Section: Prominent System Name */}
+        <div className="my-2">
+          <h3 className={`text-lg sm:text-xl font-bold tracking-tight leading-snug group-hover:text-cyan-300 transition-colors ${
+            darkMode ? 'text-slate-100' : 'text-slate-900'
+          }`}>
+            {system.systemName}
+          </h3>
         </div>
 
-        {/* View Details CTA */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onViewDetails(system);
-          }}
-          className={`flex items-center gap-1 text-xs font-semibold px-2.5 py-1.5 rounded-lg transition-colors ${
-            darkMode ? 'text-slate-300 hover:text-cyan-300 hover:bg-slate-800' : 'text-slate-700 hover:text-blue-600 hover:bg-slate-200'
-          }`}
-        >
-          <span>Details</span>
-          <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-        </button>
+        {/* Status Telemetry & Live Heartbeat */}
+        <div className="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <HeartbeatIndicator
+              status={localHeartbeat}
+              system={system}
+              onRefreshPing={handleRefreshPulse}
+              darkMode={darkMode}
+              showLatency={true}
+            />
+          </div>
+
+          {/* Clean View Details Indicator */}
+          <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg transition-all ${
+            darkMode 
+              ? 'text-cyan-400 group-hover:text-cyan-300 group-hover:translate-x-1' 
+              : 'text-blue-600 group-hover:text-blue-700 group-hover:translate-x-1'
+          }`}>
+            <span className="font-mono text-[11px]">DETAILS</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </div>
+        </div>
+
       </div>
-    </div>
+    </motion.div>
   );
 };
+
+
